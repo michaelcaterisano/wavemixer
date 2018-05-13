@@ -58,7 +58,7 @@ class WaveformContainer extends React.Component {
     return (
       <div>
       {waveforms}
-        <button onClick={this.togglePlay}>test</button>
+        <button onClick={this.togglePlay}>play/pause</button>
         <button onClick={this.resetPlayhead}>reset playhead</button>
         <input type="file" onChange={this.fileUpload}></input>
       </div>
