@@ -1,6 +1,12 @@
 import React from "react";
 import Waveform from "./Waveform";
+import keyIndex from 'react-key-index';
+import 'react-dropdown/style.css';
 
+const data = [
+  {url: 'https://s3.us-east-2.amazonaws.com/cutletmedia/fill2.mp3', name: 'fill2.mp3'}, 
+  {url: require('./notFlowing.mp3'), name: 'notFlowing.mp3'}
+  ] 
 
 class WaveformContainer extends React.Component {
   constructor() {
@@ -9,12 +15,18 @@ class WaveformContainer extends React.Component {
     this.togglePlay = this.togglePlay.bind(this);
     this.fileUpload = this.fileUpload.bind(this);
     this.resetPlayhead = this.resetPlayhead.bind(this);
+    this.getFilenames = this.getFilenames.bind(this);
+    this.handleMenuChange = this.handleMenuChange.bind(this);
 
     this.state = {
       isPlaying: false,
       isAtBeginning: true,
-      urls: ['https://s3.us-east-2.amazonaws.com/cutletmedia/fill2.mp3'],
+      audioFiles: []
     };
+  }
+
+  componentWillMount() {
+    this.setState({ audioFiles: keyIndex(data, 1)})
   }
 
   togglePlay() {
@@ -33,8 +45,8 @@ class WaveformContainer extends React.Component {
     const reader = new FileReader();
 
     reader.addEventListener("load", ()=> {
-      this.setState(prevState => ({
-        urls: [...prevState.urls, reader.result]}))
+      data.push({name: file.name, url: reader.result})
+      this.setState({ audioFiles: keyIndex(data, 1)})
     }, false);
 
     if (file) {
@@ -43,21 +55,39 @@ class WaveformContainer extends React.Component {
 
   }
 
+  getFilenames() {
+    return this.state.audioFiles.map(file => file.name)
+  }
+
+  handleMenuChange(e, childId) { 
+    const newName = e.value;
+    const newUrl = data.find(el => el.name === newName).url;
+    const newAudioFiles = this.state.audioFiles.map(el => el._urlId === childId ? Object.assign({}, el, {name: newName, url: newUrl}) : el )
+    this.setState({ audioFiles: keyIndex(newAudioFiles, 1) })
+  }
 
 
   render() {
-
-    const waveforms = [];
-    this.state.urls.map(url => {
-      waveforms.push(<Waveform 
-                        src={url} 
-                        isPlaying={this.state.isPlaying}
-                        isAtBeginning={this.state.isAtBeginning} />)
-    })
+    console.log(this.state)
 
     return (
       <div>
-      {waveforms}
+      {this.state.audioFiles.map((file, i) => {
+        return (
+          <div>
+            <Waveform
+              key={file._urlId} 
+              id={file._urlId}
+              src={file.url}
+              name={file.name}
+              names={data.map(el => el.name)}
+              handleMenuChange={this.handleMenuChange} 
+              isPlaying={this.state.isPlaying}
+              isAtBeginning={this.state.isAtBeginning} 
+            />
+          </div>
+        )
+      })}
         <button onClick={this.togglePlay}>play/pause</button>
         <button onClick={this.resetPlayhead}>reset playhead</button>
         <input type="file" onChange={this.fileUpload}></input>

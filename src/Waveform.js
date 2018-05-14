@@ -2,6 +2,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import WaveSurfer from "wavesurfer";
+import Dropdown from 'react-dropdown';
+
 
 export default class Waveform extends React.Component {
   constructor(props) {
@@ -10,6 +12,8 @@ export default class Waveform extends React.Component {
     this.waveform = React.createRef();
     this.play = this.play.bind(this);
     this.resetPlayhead = this.resetPlayhead.bind(this);
+    // this.handleMenuChange = this.handleMenuChange.bind(this);
+
 
     this.state = {
       wavesurfer: null,
@@ -34,6 +38,9 @@ export default class Waveform extends React.Component {
     if (newProps.isAtBeginning === true && newProps.isAtBeginning !== this.props.isAtBeginning) {
       this.resetPlayhead();
     }
+    if (newProps.src !== this.props.src) {
+      this.state.wavesurfer.load(newProps.src)
+    }
   }
 
   play() {
@@ -44,10 +51,17 @@ export default class Waveform extends React.Component {
     this.state.wavesurfer.seekTo(0);
   }
 
+  // handleMenuChange(e) {
+  //   console.log(e.value)
+  //   console.log(this.props)
+  // }
+
   render() {
     return (
       <div>
         <div ref={this.waveform} />
+        <span>{this.props.name}</span>
+        <Dropdown options={this.props.names} onChange={(e) => this.props.handleMenuChange(e, this.props.id)} value={this.props.name} placeholder="Select an option" />
       </div>
     );
   }
