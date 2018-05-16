@@ -25,13 +25,18 @@ export default class Waveform extends React.Component {
     const wavesurfer = WaveSurfer.create({
       container: this.waveform.current,
       waveColor: "violet",
-      progressColor: "purple"
+      progressColor: "purple",
+      height: 50
     });
     this.setState({ wavesurfer });
     wavesurfer.load(this.props.src);
+    wavesurfer.on('seek', this.props.updateProgress)
   }
 
   componentWillReceiveProps(newProps) {
+    if (newProps.progress !== this.props.progress) {
+      this.state.wavesurfer.seekTo(newProps.progress);
+    }
     if (newProps.isPlaying !== this.props.isPlaying) {
       this.play();
     }
@@ -48,7 +53,7 @@ export default class Waveform extends React.Component {
   }
 
   resetPlayhead() {
-    this.state.wavesurfer.seekTo(0);
+    this.state.wavesurfer.stop();
   }
 
   // handleMenuChange(e) {

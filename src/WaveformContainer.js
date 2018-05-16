@@ -3,10 +3,7 @@ import Waveform from "./Waveform";
 import keyIndex from 'react-key-index';
 import 'react-dropdown/style.css';
 
-const data = [
-  {url: 'https://s3.us-east-2.amazonaws.com/cutletmedia/fill2.mp3', name: 'fill2.mp3'}, 
-  {url: require('./notFlowing.mp3'), name: 'notFlowing.mp3'}
-  ] 
+const data = [] 
 
 class WaveformContainer extends React.Component {
   constructor() {
@@ -17,16 +14,18 @@ class WaveformContainer extends React.Component {
     this.resetPlayhead = this.resetPlayhead.bind(this);
     this.getFilenames = this.getFilenames.bind(this);
     this.handleMenuChange = this.handleMenuChange.bind(this);
+    this.updateProgress = this.updateProgress.bind(this);
 
     this.state = {
       isPlaying: false,
       isAtBeginning: true,
+      progress: 0.0,
       audioFiles: []
     };
   }
 
   componentWillMount() {
-    this.setState({ audioFiles: keyIndex(data, 1)})
+    this.setState({ audioFiles: keyIndex(data, 1) })
   }
 
   togglePlay() {
@@ -35,9 +34,12 @@ class WaveformContainer extends React.Component {
       isAtBeginning: false });
   }
 
+  updateProgress(progress) {
+    this.setState({ progress, isAtBeginning: false })
+  }
+
   resetPlayhead() {
     this.setState({ isAtBeginning: true })
-    console.log(this.state.isAtBeginning)
   }
 
   fileUpload(event) {
@@ -83,6 +85,8 @@ class WaveformContainer extends React.Component {
               names={data.map(el => el.name)}
               handleMenuChange={this.handleMenuChange} 
               isPlaying={this.state.isPlaying}
+              progress={this.state.progress}
+              updateProgress={this.updateProgress}
               isAtBeginning={this.state.isAtBeginning} 
             />
           </div>
