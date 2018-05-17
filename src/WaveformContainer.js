@@ -31,7 +31,8 @@ class WaveformContainer extends React.Component {
   togglePlay() {
     this.setState({ 
       isPlaying: !this.state.isPlaying,
-      isAtBeginning: false });
+      isAtBeginning: false 
+    });
   }
 
   updateProgress(progress) {
@@ -43,18 +44,21 @@ class WaveformContainer extends React.Component {
   }
 
   fileUpload(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
+    const files = event.target.files
 
-    reader.addEventListener("load", ()=> {
-      data.push({name: file.name, url: reader.result})
-      this.setState({ audioFiles: keyIndex(data, 1)})
-    }, false);
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
 
-    if (file) {
-      reader.readAsDataURL(file);
+      reader.addEventListener("load", () => {
+        data.push({name: file.name, url: reader.result})
+        this.setState({ audioFiles: keyIndex(data, 1)})
+      }, false);
+  
+      if (file) {
+        reader.readAsDataURL(file);
+      }
     }
-
   }
 
   getFilenames() {
@@ -70,7 +74,6 @@ class WaveformContainer extends React.Component {
 
 
   render() {
-    console.log(this.state)
 
     return (
       <div>
@@ -94,7 +97,7 @@ class WaveformContainer extends React.Component {
       })}
         <button onClick={this.togglePlay}>play/pause</button>
         <button onClick={this.resetPlayhead}>reset playhead</button>
-        <input type="file" onChange={this.fileUpload}></input>
+        <input type="file" multiple="multiple" onChange={this.fileUpload}></input>
       </div>
     );
   }
