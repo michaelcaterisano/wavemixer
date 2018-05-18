@@ -15,6 +15,7 @@ export default class Waveform extends React.Component {
     this.resetPlayhead = this.resetPlayhead.bind(this);
     this.setInitialPlayhead = this.setInitialPlayhead.bind(this);
     this.getProgress = this.getProgress.bind(this);
+    this.removeFile = this.removeFile.bind(this);
   
     this.state = {
       wavesurfer: null
@@ -73,14 +74,21 @@ export default class Waveform extends React.Component {
     this.props.updateProgress(progress)
   }
 
+  removeFile(idx) {
+    this.state.wavesurfer.destroy();
+    this.props.isNotPlaying();
+    this.props.removeFile(idx);
+  }
+
   render() {
-    console.log(this.props)
     let idx = this.props.idx;
     return (
       <div>
         <div ref={this.waveform} />
-        <Dropdown options={this.props.options} onChange={(e) => this.props.handleMenuChange(e, idx)} value={this.props.name} placeholder="Select an option" />
-        <button onClick={(idx) => this.props.removeFile(idx)}>remove</button>
+        <div style={{display: 'flex'}}>
+          <Dropdown options={this.props.options} onChange={(e) => this.props.handleMenuChange(e, idx)} value={this.props.name} placeholder="Select an option" />
+          <button onClick={(idx) => this.removeFile(idx)}>remove</button>
+        </div>
       </div>
     );
   }

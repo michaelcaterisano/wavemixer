@@ -4,6 +4,8 @@ import Dropdown from 'react-dropdown';
 import keyIndex from 'react-key-index';
 import shortid from 'shortid';
 import 'react-dropdown/style.css';
+import fileDownload from 'js-file-download';
+import jszip from 'jszip';
 
 const data = [];
 
@@ -31,6 +33,7 @@ class WaveformContainer extends React.Component {
     this.removeFile = this.removeFile.bind(this);
     this.createWaveform = this.createWaveform.bind(this);
     this.updateSelectedFile = this.updateSelectedFile.bind(this);
+    this.isNotPlaying = this.isNotPlaying.bind(this);
 
     this.state = {
       isPlaying: false,
@@ -38,7 +41,8 @@ class WaveformContainer extends React.Component {
       progress: 0.0,
       audioFiles: [],
       selectedFile: null,
-      options: []
+      options: [], 
+      files: []
     };
   }
 
@@ -47,6 +51,10 @@ class WaveformContainer extends React.Component {
       isPlaying: !this.state.isPlaying,
       isAtBeginning: false 
     });
+  }
+
+  isNotPlaying() {
+    this.setState({ isPlaying: false })
   }
 
   updateProgress(progress) {
@@ -63,6 +71,10 @@ class WaveformContainer extends React.Component {
     for (let i = 0; i < files.length; i++) {
       const reader = new FileReader();
       const file = files[i];
+
+      if (!this.state.files.includes(file)){
+        this.setState({ files: [...this.state.files, file]})
+      }
 
       reader.addEventListener("load", () => {
         if (data.find(el => el.name === file.name)) {
@@ -120,19 +132,38 @@ class WaveformContainer extends React.Component {
   }
 
   render() {
+    console.log(this.state.files)
 
     return (
       <div>
+        <div style={{display: 'block', width: '300px', margin: '10px'}}>
+          <h1>Oh hi</h1>
+          <span >
+          Upload one or more audio files. Click 'create waveform'
+          to generate a waveform from the currently selected file 
+          (you can change its audio source later).
+          Use the dropdown menu on the waveform to change its audio 
+          file source. Click 'remove' to remove the waveform.
+          </span>
+        </div>
+
         <div style={style.mainDropdown}>
-          <Dropdown options={this.state.options} onChange={(e) => this.updateSelectedFile(e)} value={this.state.options[0]} placeholder={'select a file'} />
-          <input type="file" multiple="multiple" onChange={this.fileUpload} disabled={this.state.isPlaying}></input>
-          <button onClick={this.createWaveform} disabled={this.state.isPlaying}>create waveform </button>
+
+            <p><input type="file" multiple="multiple" onChange={this.fileUpload} disabled={this.state.isPlaying}></input></p>
+          <div style={{display: 'flex'}}>
+            {/* <span>All Files: </span> */}
+            <Dropdown options={this.state.options} onChange={(e) => this.updateSelectedFile(e)} value={this.state.options[0]} placeholder={'upload some files!'} />
+            <button onClick={this.createWaveform} disabled={this.state.isPlaying || data.length === 0}>create waveform</button>
+          </div>
           <p>
+            <p>Controls:</p>
             <button onClick={this.togglePlay} disabled={this.state.audioFiles.length === 0}>
               <i className={this.state.isPlaying ? "fas fa-pause-circle" : "fas fa-play-circle"}></i>
+              <span style={{padding: '5px'}}>Play/pause all</span>
             </button>
             <button onClick={this.resetPlayhead} disabled={this.state.audioFiles.length === 0}>
               <i class="fas fa-backward"></i>
+              <span style={{padding: '5px'}}>Back to beginning</span>
             </button>
           </p>
         </div>
@@ -152,6 +183,7 @@ class WaveformContainer extends React.Component {
                 updateProgress={this.updateProgress}
                 isAtBeginning={this.state.isAtBeginning} 
                 removeFile={this.removeFile}
+                isNotPlaying={this.isNotPlaying}
               />
             )}
           )}
