@@ -1,7 +1,6 @@
 import React from "react";
 import Waveform from "./Waveform";
 import Dropdown from 'react-dropdown';
-import keyIndex from 'react-key-index';
 import shortid from 'shortid';
 import 'react-dropdown/style.css';
 import fileDownload from 'js-file-download';
