@@ -14,6 +14,7 @@ export default class Waveform extends React.Component {
     // bound functions
     this.resetPlayhead = this.resetPlayhead.bind(this);
     this.setInitialPlayhead = this.setInitialPlayhead.bind(this);
+    this.getProgress = this.getProgress.bind(this);
   
     this.state = {
       wavesurfer: null
@@ -31,6 +32,7 @@ export default class Waveform extends React.Component {
 
     wavesurfer.load(this.props.src);
     wavesurfer.on('seek', this.props.updateProgress)
+    wavesurfer.on('pause', this.getProgress)
     wavesurfer.on('ready', this.setInitialPlayhead)
 
     this.setState({ wavesurfer });
@@ -59,16 +61,23 @@ export default class Waveform extends React.Component {
   }
 
   setInitialPlayhead() {
-    console.log('from set initial: ', this.props.progress)
-    this.state.wavesurfer.seekTo(this.props.progress)
+    if (this.props.progress !== 0) {
+      this.state.wavesurfer.seekTo(this.props.progress)
+    }
+  }
+
+  getProgress() {
+    const current = this.state.wavesurfer.getCurrentTime();
+    const duration = this.state.wavesurfer.getDuration();
+    const progress = current/duration
+    this.props.updateProgress(progress)
   }
 
   render() {
     return (
       <div>
         <div ref={this.waveform} />
-        <span>{this.props.name}</span>
-        <Dropdown options={this.props.names} onChange={(e) => this.props.handleMenuChange(e, this.props.id)} value={this.props.name} placeholder="Select an option" />
+        <Dropdown options={this.props.options} onChange={(e) => this.props.handleMenuChange(e, this.props.idx)} value={this.props.name} placeholder="Select an option" />
       </div>
     );
   }

@@ -6,10 +6,7 @@ import WaveformContainer from './WaveformContainer';
 
 
 const App = () => (
-  <div>
-    <WaveformContainer />
-   
-  </div>
+  <WaveformContainer />  
 );
 
 render(<App />, document.getElementById('root'));
