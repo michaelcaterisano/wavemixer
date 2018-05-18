@@ -74,10 +74,13 @@ export default class Waveform extends React.Component {
   }
 
   render() {
+    console.log(this.props)
+    let idx = this.props.idx;
     return (
       <div>
         <div ref={this.waveform} />
-        <Dropdown options={this.props.options} onChange={(e) => this.props.handleMenuChange(e, this.props.idx)} value={this.props.name} placeholder="Select an option" />
+        <Dropdown options={this.props.options} onChange={(e) => this.props.handleMenuChange(e, idx)} value={this.props.name} placeholder="Select an option" />
+        <button onClick={(idx) => this.props.removeFile(idx)}>remove</button>
       </div>
     );
   }

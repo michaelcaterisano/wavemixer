@@ -1,10 +1,22 @@
 import React from "react";
 import Waveform from "./Waveform";
+import Dropdown from 'react-dropdown';
 import keyIndex from 'react-key-index';
 import shortid from 'shortid';
 import 'react-dropdown/style.css';
 
 const data = [];
+
+const style = {
+  mainDropdown: {
+    padding: '10px'
+  },
+  controls: {
+    padding: '10px'
+  },
+  waveForm: {
+  }
+}
 
 class WaveformContainer extends React.Component {
   constructor() {
@@ -16,18 +28,19 @@ class WaveformContainer extends React.Component {
     this.getFilenames = this.getFilenames.bind(this);
     this.handleMenuChange = this.handleMenuChange.bind(this);
     this.updateProgress = this.updateProgress.bind(this);
+    this.removeFile = this.removeFile.bind(this);
+    this.createWaveform = this.createWaveform.bind(this);
+    this.updateSelectedFile = this.updateSelectedFile.bind(this);
 
     this.state = {
       isPlaying: false,
       isAtBeginning: true,
       progress: 0.0,
-      audioFiles: []
+      audioFiles: [],
+      selectedFile: null,
+      options: []
     };
   }
-
-  // componentWillMount() {
-  //   this.setState({ audioFiles: data })
-  // }
 
   togglePlay() {
     this.setState({ 
@@ -52,15 +65,28 @@ class WaveformContainer extends React.Component {
       const file = files[i];
 
       reader.addEventListener("load", () => {
-        data.push({id: shortid.generate() ,name: file.name, url: reader.result})
-        let newAudioFiles = Array.from(data) // make a copy of data, not a ref to it
-        this.setState({ audioFiles: newAudioFiles })
+        if (data.find(el => el.name === file.name)) {
+          console.log('already uploaded')
+          return
+        }
+
+        data.push({id: shortid.generate(), name: file.name, url: reader.result})
+        const options = data.map(el => {
+          let newObj = {};
+          newObj['value'] = el.id;
+          newObj['label'] = el.name;
+          return newObj;
+        })
+        this.setState({ options })
+        // let newAudioFiles = Array.from(data) // make a copy of data, not a ref to it
+        // this.setState({ audioFiles: newAudioFiles })
       }, false);
   
       if (file) {
         reader.readAsDataURL(file);
       }
     }
+    event.target.value = null;
   }
 
   getFilenames() {
@@ -74,35 +100,62 @@ class WaveformContainer extends React.Component {
     this.setState({ audioFiles: newAudioFiles})
   }
 
+  removeFile(idx) {
+    const newAudioFiles = Array.from(this.state.audioFiles);
+    newAudioFiles.splice(idx, 1)
+    this.setState({ audioFiles: newAudioFiles})
+  }
+
+  createWaveform() {
+    if (data.length === 0) {
+      return
+    }
+    const id = this.state.selectedFile ? this.state.selectedFile : this.state.options[0].value
+    const waveform = data.filter(el => el.id === id )
+    this.setState({ audioFiles: [...this.state.audioFiles, waveform[0]]})
+  }
+
+  updateSelectedFile(e) {
+    this.setState({ selectedFile: e.value})
+  }
+
   render() {
-    const options = data.map(el => {
-      let newObj = {};
-      newObj['value'] = el.id;
-      newObj['label'] = el.name;
-      return newObj;
-    })
 
     return (
       <div>
-      {this.state.audioFiles.map((file, i) => {
-        return (
-          <Waveform
-            key={i}
-            idx={i}
-            src={file.url}
-            name={file.name}
-            options={options}
-            handleMenuChange={this.handleMenuChange} 
-            isPlaying={this.state.isPlaying}
-            progress={this.state.progress}
-            updateProgress={this.updateProgress}
-            isAtBeginning={this.state.isAtBeginning} 
-          />
-        )}
-      )}
-        <button onClick={this.togglePlay}>play/pause</button>
-        <button onClick={this.resetPlayhead}>reset playhead</button>
-        <input type="file" multiple="multiple" onChange={this.fileUpload}></input>
+        <div style={style.mainDropdown}>
+          <Dropdown options={this.state.options} onChange={(e) => this.updateSelectedFile(e)} value={this.state.options[0]} placeholder={'select a file'} />
+          <input type="file" multiple="multiple" onChange={this.fileUpload} disabled={this.state.isPlaying}></input>
+          <button onClick={this.createWaveform} disabled={this.state.isPlaying}>create waveform </button>
+          <p>
+            <button onClick={this.togglePlay} disabled={this.state.audioFiles.length === 0}>
+              <i className={this.state.isPlaying ? "fas fa-pause-circle" : "fas fa-play-circle"}></i>
+            </button>
+            <button onClick={this.resetPlayhead} disabled={this.state.audioFiles.length === 0}>
+              <i class="fas fa-backward"></i>
+            </button>
+          </p>
+        </div>
+      
+        <div style={style.waveForm}>
+          {this.state.audioFiles.map((file, i) => {
+            return (
+              <Waveform
+                key={i}
+                idx={i}
+                src={file.url}
+                name={file.name}
+                options={this.state.options}
+                handleMenuChange={this.handleMenuChange} 
+                isPlaying={this.state.isPlaying}
+                progress={this.state.progress}
+                updateProgress={this.updateProgress}
+                isAtBeginning={this.state.isAtBeginning} 
+                removeFile={this.removeFile}
+              />
+            )}
+          )}
+        </div>
       </div>
     );
   }
