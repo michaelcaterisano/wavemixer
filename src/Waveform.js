@@ -16,10 +16,12 @@ export default class Waveform extends React.Component {
     this.setInitialPlayhead = this.setInitialPlayhead.bind(this);
     this.getProgress = this.getProgress.bind(this);
     this.removeFile = this.removeFile.bind(this);
+
+    this.wavesurfer = null
   
-    this.state = {
-      wavesurfer: null
-    };
+    // this.state = {
+    //   wavesurfer: null
+    // };
   }
 
   componentDidMount() {
@@ -28,66 +30,92 @@ export default class Waveform extends React.Component {
       container: this.waveform.current,
       waveColor: "violet",
       progressColor: "purple",
-      height: 50
+      height: 50,
+      responsive: 2.0
     });
 
     wavesurfer.load(this.props.src);
     wavesurfer.on('seek', this.props.updateProgress)
     wavesurfer.on('pause', this.getProgress)
     wavesurfer.on('ready', this.setInitialPlayhead)
+    wavesurfer.on('finish', () => {
+      this.wavesurfer.stop();
+      this.props.resetPlayhead();
+    })
 
-    this.setState({ wavesurfer });
+
+    // Hack to make wavesurfer resize
+    const responsiveWave = wavesurfer.util.debounce(function() {
+      wavesurfer.empty();
+      wavesurfer.drawBuffer();
+    }, 150);
+    
+    window.addEventListener('resize', responsiveWave);
+
+    this.wavesurfer = wavesurfer;
+
   }
 
   componentWillReceiveProps(newProps) {
+    console.log('will receive props')
     if (newProps.progress !== this.props.progress) {
-      this.state.wavesurfer.seekTo(newProps.progress);
+      console.log('if 1')
+      this.wavesurfer.seekTo(newProps.progress);
     }
     if (newProps.isPlaying === true) {
-      this.state.wavesurfer.play();
+      console.log('if 2')
+
+      this.wavesurfer.play();
     }
-    if (newProps.isPlaying === false) {
-      this.state.wavesurfer.pause();
+    if (newProps.isPlaying === false && newProps.isPlaying !== this.props.isPlaying) {
+      console.log('if 3')
+
+      this.wavesurfer.pause();
     } 
     if (newProps.isAtBeginning === true && newProps.isAtBeginning !== this.props.isAtBeginning) {
+      console.log('if 4')
+
       this.resetPlayhead();
     }
     if (newProps.src !== this.props.src) {
-      this.state.wavesurfer.load(newProps.src)
+      console.log('if 5')
+
+      this.wavesurfer.load(newProps.src)
     }
   }
 
   resetPlayhead() {
-    this.state.wavesurfer.seekTo(0);
+    this.wavesurfer.seekTo(0);
   }
 
   setInitialPlayhead() {
     if (this.props.progress !== 0) {
-      this.state.wavesurfer.seekTo(this.props.progress)
+      this.wavesurfer.seekTo(this.props.progress)
     }
   }
 
   getProgress() {
-    const current = this.state.wavesurfer.getCurrentTime();
-    const duration = this.state.wavesurfer.getDuration();
+    const current = this.wavesurfer.getCurrentTime();
+    const duration = this.wavesurfer.getDuration();
     const progress = current/duration
     this.props.updateProgress(progress)
   }
 
-  removeFile(idx) {
-    this.state.wavesurfer.destroy();
-    this.props.isNotPlaying();
-    this.props.removeFile(idx);
+  removeFile() {
+    this.props.removeFile(this.props.idx);
+    this.wavesurfer.pause();
   }
 
   render() {
+    console.log('render', this.props)
     let idx = this.props.idx;
     return (
       <div>
         <div ref={this.waveform} />
         <div style={{display: 'flex'}}>
+          <paper-range-slider snaps pin step='1' min='0' max='100' value-diff-min="10" value-diff-max="50" value-min='30' value-max='60'></paper-range-slider>
           <Dropdown options={this.props.options} onChange={(e) => this.props.handleMenuChange(e, idx)} value={this.props.name} placeholder="Select an option" />
-          <button onClick={(idx) => this.removeFile(idx)}>remove</button>
+          <button onClick={() => this.removeFile() }>remove</button>
         </div>
       </div>
     );
