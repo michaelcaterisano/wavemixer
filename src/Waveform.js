@@ -3,7 +3,6 @@ import ReactDOM from "react-dom";
 import WaveSurfer from "wavesurfer";
 import Dropdown from 'react-dropdown';
 
-
 export default class Waveform extends React.Component {
   constructor() {
     super();
@@ -16,12 +15,13 @@ export default class Waveform extends React.Component {
     this.setInitialPlayhead = this.setInitialPlayhead.bind(this);
     this.getProgress = this.getProgress.bind(this);
     this.removeFile = this.removeFile.bind(this);
+    this.setVolume = this.setVolume.bind(this);
 
     this.wavesurfer = null
   
-    // this.state = {
-    //   wavesurfer: null
-    // };
+    this.state = {
+      volume: 0.5
+    };
   }
 
   componentDidMount() {
@@ -38,26 +38,23 @@ export default class Waveform extends React.Component {
     wavesurfer.on('seek', this.props.updateProgress)
     wavesurfer.on('pause', this.getProgress)
     wavesurfer.on('ready', this.setInitialPlayhead)
-    wavesurfer.on('finish', () => {
-      this.wavesurfer.stop();
-      this.props.resetPlayhead();
-    })
+    wavesurfer.on('finish', this.props.setFinished)
 
 
     // Hack to make wavesurfer resize
     const responsiveWave = wavesurfer.util.debounce(function() {
       wavesurfer.empty();
       wavesurfer.drawBuffer();
-    }, 150);
-    
+    }, 150); 
     window.addEventListener('resize', responsiveWave);
 
+    
     this.wavesurfer = wavesurfer;
+    
 
   }
 
   componentWillReceiveProps(newProps) {
-    console.log('will receive props')
     if (newProps.progress !== this.props.progress) {
       console.log('if 1')
       this.wavesurfer.seekTo(newProps.progress);
@@ -70,7 +67,7 @@ export default class Waveform extends React.Component {
     if (newProps.isPlaying === false && newProps.isPlaying !== this.props.isPlaying) {
       console.log('if 3')
 
-      this.wavesurfer.pause();
+      this.wavesurfer.stop();
     } 
     if (newProps.isAtBeginning === true && newProps.isAtBeginning !== this.props.isAtBeginning) {
       console.log('if 4')
@@ -106,17 +103,27 @@ export default class Waveform extends React.Component {
     this.wavesurfer.pause();
   }
 
+  setVolume(e) {
+    this.setState({volume: e.target.value})
+    this.wavesurfer.setVolume(e.target.value)
+  }
+
   render() {
     console.log('render', this.props)
     let idx = this.props.idx;
     return (
       <div>
         <div ref={this.waveform} />
+
+        <div>
+          <input type="range" min="0" max="1" step="0.01" value={this.state.volume} onChange={this.setVolume}/>
+        </div>
+
         <div style={{display: 'flex'}}>
-          <paper-range-slider snaps pin step='1' min='0' max='100' value-diff-min="10" value-diff-max="50" value-min='30' value-max='60'></paper-range-slider>
           <Dropdown options={this.props.options} onChange={(e) => this.props.handleMenuChange(e, idx)} value={this.props.name} placeholder="Select an option" />
           <button onClick={() => this.removeFile() }>remove</button>
         </div>
+        
       </div>
     );
   }

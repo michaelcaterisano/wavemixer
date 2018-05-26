@@ -32,7 +32,7 @@ class WaveformContainer extends React.Component {
     this.removeFile = this.removeFile.bind(this);
     this.createWaveform = this.createWaveform.bind(this);
     this.updateSelectedFile = this.updateSelectedFile.bind(this);
-    this.isNotPlaying = this.isNotPlaying.bind(this);
+    this.setFinished = this.setFinished.bind(this);
 
     this.state = {
       isPlaying: false,
@@ -53,7 +53,7 @@ class WaveformContainer extends React.Component {
     });
   }
 
-  isNotPlaying() {
+  setFinished() {
     this.setState({ isPlaying: false })
   }
 
@@ -181,7 +181,7 @@ class WaveformContainer extends React.Component {
                 updateProgress={this.updateProgress}
                 isAtBeginning={this.state.isAtBeginning} 
                 removeFile={this.removeFile}
-                isNotPlaying={this.isNotPlaying}
+                setFinished={this.setFinished}
                 resetPlayhead={this.resetPlayhead}
               />
             )}
