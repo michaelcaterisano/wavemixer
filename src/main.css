@@ -1,0 +1,8 @@
+.Dropdown-disabled {
+    color: grey;
+    font-style: italic;
+}
+
+.Dropdown-root {
+    width: 300px;
+}

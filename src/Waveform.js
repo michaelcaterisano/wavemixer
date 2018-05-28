@@ -1,7 +1,8 @@
 import React from "react";
-import ReactDOM from "react-dom";
+// import ReactDOM from "react-dom";
 import WaveSurfer from "wavesurfer";
 import Dropdown from 'react-dropdown';
+
 
 export default class Waveform extends React.Component {
   constructor() {
@@ -17,7 +18,7 @@ export default class Waveform extends React.Component {
     this.removeFile = this.removeFile.bind(this);
     this.setVolume = this.setVolume.bind(this);
 
-    this.wavesurfer = null
+    // this.wavesurfer = null
   
     this.state = {
       volume: 0.5
@@ -25,7 +26,6 @@ export default class Waveform extends React.Component {
   }
 
   componentDidMount() {
-
     const wavesurfer = WaveSurfer.create({
       container: this.waveform.current,
       waveColor: "violet",
@@ -34,51 +34,51 @@ export default class Waveform extends React.Component {
       responsive: 2.0
     });
 
-    wavesurfer.load(this.props.src);
-    wavesurfer.on('seek', this.props.updateProgress)
-    wavesurfer.on('pause', this.getProgress)
-    wavesurfer.on('ready', this.setInitialPlayhead)
-    wavesurfer.on('finish', this.props.setFinished)
+    this.wavesurfer = wavesurfer;
+
+    this.wavesurfer.load(this.props.src);
+    this.wavesurfer.on('seek', this.props.updateProgress)
+    this.wavesurfer.on('pause', this.getProgress)
+    this.wavesurfer.on('ready', this.setInitialPlayhead)
+    this.wavesurfer.on('finish', this.props.setFinished)
 
 
     // Hack to make wavesurfer resize
-    const responsiveWave = wavesurfer.util.debounce(function() {
-      wavesurfer.empty();
+    const responsiveWave = this.wavesurfer.util.debounce(() => {
+      // wavesurfer.empty();
+      wavesurfer.drawer.setWidth(0),
+      wavesurfer.drawer.drawPeaks({
+        length: wavesurfer.drawer.getWidth()
+      }, 0)
       wavesurfer.drawBuffer();
     }, 150); 
-    window.addEventListener('resize', responsiveWave);
 
-    
-    this.wavesurfer = wavesurfer;
-    
 
+    window.addEventListener('resize', () => {
+      responsiveWave()
+    });
   }
 
   componentWillReceiveProps(newProps) {
     if (newProps.progress !== this.props.progress) {
-      console.log('if 1')
       this.wavesurfer.seekTo(newProps.progress);
     }
     if (newProps.isPlaying === true) {
-      console.log('if 2')
-
       this.wavesurfer.play();
     }
     if (newProps.isPlaying === false && newProps.isPlaying !== this.props.isPlaying) {
-      console.log('if 3')
-
-      this.wavesurfer.stop();
+      this.wavesurfer.pause();
     } 
     if (newProps.isAtBeginning === true && newProps.isAtBeginning !== this.props.isAtBeginning) {
-      console.log('if 4')
-
       this.resetPlayhead();
     }
     if (newProps.src !== this.props.src) {
-      console.log('if 5')
-
       this.wavesurfer.load(newProps.src)
     }
+  }
+
+  componentWillUnmount() {
+    this.wavesurfer.destroy();
   }
 
   resetPlayhead() {
@@ -100,7 +100,6 @@ export default class Waveform extends React.Component {
 
   removeFile() {
     this.props.removeFile(this.props.idx);
-    this.wavesurfer.pause();
   }
 
   setVolume(e) {
@@ -109,7 +108,7 @@ export default class Waveform extends React.Component {
   }
 
   render() {
-    console.log('render', this.props)
+    const options = [...this.props.options, ]
     let idx = this.props.idx;
     return (
       <div>
@@ -120,7 +119,11 @@ export default class Waveform extends React.Component {
         </div>
 
         <div style={{display: 'flex'}}>
-          <Dropdown options={this.props.options} onChange={(e) => this.props.handleMenuChange(e, idx)} value={this.props.name} placeholder="Select an option" />
+          <Dropdown disabled={this.props.isPlaying} 
+                    options={this.props.options} 
+                    onChange={(e) => this.props.handleMenuChange(e, idx)} 
+                    value={this.props.name} 
+                    placeholder="Select an option"/>
           <button onClick={() => this.removeFile() }>remove</button>
         </div>
         

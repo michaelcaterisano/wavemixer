@@ -42,14 +42,14 @@ class WaveformContainer extends React.Component {
       selectedFileId: null,
       selectedFileName: null,
       options: [], 
-      files: []
+      files: [],
     };
   }
 
   togglePlay() {
     this.setState({ 
       isPlaying: !this.state.isPlaying,
-      isAtBeginning: false 
+      isAtBeginning: false
     });
   }
 
@@ -78,7 +78,6 @@ class WaveformContainer extends React.Component {
 
       reader.addEventListener("load", () => {
         if (data.find(el => el.name === file.name)) {
-          console.log('already uploaded')
           return
         }
 
@@ -90,8 +89,6 @@ class WaveformContainer extends React.Component {
           return newObj;
         })
         this.setState({ options })
-        // let newAudioFiles = Array.from(data) // make a copy of data, not a ref to it
-        // this.setState({ audioFiles: newAudioFiles })
       }, false);
   
       if (file) {
@@ -113,9 +110,10 @@ class WaveformContainer extends React.Component {
   }
 
   removeFile(idx) {
+    this.setState({isPlaying: false})
     const newAudioFiles = Array.from(this.state.audioFiles);
     newAudioFiles.splice(idx, 1)
-    this.setState({ audioFiles: newAudioFiles, isPlaying: false})
+    this.setState({ audioFiles: newAudioFiles })
   }
 
   createWaveform() {
@@ -149,8 +147,7 @@ class WaveformContainer extends React.Component {
         <div style={style.mainDropdown}>
 
             <p><input type="file" multiple="multiple" onChange={this.fileUpload} disabled={this.state.isPlaying}></input></p>
-          <div style={{dis: 'flex'}}>
-            {/* <span>All Files: </span> */}
+          <div style={{display: 'flex'}}>
             <Dropdown options={this.state.options} onChange={(e) => this.updateSelectedFile(e)} value={this.state.selectedFileName || this.state.options[0]} placeholder={'upload some files!'} />
             <button onClick={this.createWaveform} disabled={this.state.isPlaying || data.length === 0}>create waveform</button>
           </div>
@@ -170,6 +167,7 @@ class WaveformContainer extends React.Component {
           {this.state.audioFiles.map((file, i) => {
             return (
               <Waveform
+                disabled={false}
                 key={i}
                 idx={i}
                 src={file.url}
