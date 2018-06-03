@@ -33,6 +33,7 @@ class WaveformContainer extends React.Component {
     this.createWaveform = this.createWaveform.bind(this);
     this.updateSelectedFile = this.updateSelectedFile.bind(this);
     this.setFinished = this.setFinished.bind(this);
+    this.setCycle = this.setCycle.bind(this);
 
     this.state = {
       isPlaying: false,
@@ -43,6 +44,7 @@ class WaveformContainer extends React.Component {
       selectedFileName: null,
       options: [], 
       files: [],
+      cycle: true
     };
   }
 
@@ -129,6 +131,10 @@ class WaveformContainer extends React.Component {
     this.setState({ selectedFileId: e.value, selectedFileName: e.label })
   }
 
+  setCycle() {
+    this.setState({ cycle: !this.state.cycle })
+  }
+
   render() {
 
     return (
@@ -146,21 +152,35 @@ class WaveformContainer extends React.Component {
 
         <div style={style.mainDropdown}>
 
-            <p><input type="file" multiple="multiple" onChange={this.fileUpload} disabled={this.state.isPlaying}></input></p>
+          <p>
+            <input type="file" multiple="multiple" onChange={this.fileUpload} disabled={this.state.isPlaying}>
+            </input>
+          </p>
+
           <div style={{display: 'flex'}}>
             <Dropdown options={this.state.options} onChange={(e) => this.updateSelectedFile(e)} value={this.state.selectedFileName || this.state.options[0]} placeholder={'upload some files!'} />
             <button onClick={this.createWaveform} disabled={this.state.isPlaying || data.length === 0}>create waveform</button>
           </div>
+
           <p>
-            <p>Controls:</p>
+            <span>Controls:</span>
+
             <button onClick={this.togglePlay} disabled={this.state.audioFiles.length === 0}>
               <i className={this.state.isPlaying ? "fas fa-pause-circle" : "fas fa-play-circle"}></i>
               <span style={{padding: '5px'}}>Play/pause all</span>
             </button>
+
             <button onClick={this.resetPlayhead} disabled={this.state.audioFiles.length === 0}>
               <i className="fas fa-backward"></i>
               <span style={{padding: '5px'}}>Back to beginning</span>
             </button>
+
+            <button onClick={this.setCycle}>
+              <i className="fas fa-backward"></i>
+              <span style={{padding: '5px'}}>Cycle</span>
+            </button>
+            
+
           </p>
         </div>
       
@@ -181,6 +201,7 @@ class WaveformContainer extends React.Component {
                 removeFile={this.removeFile}
                 setFinished={this.setFinished}
                 resetPlayhead={this.resetPlayhead}
+                cycle={this.state.cycle}
               />
             )}
           )}

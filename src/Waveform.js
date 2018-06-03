@@ -1,12 +1,15 @@
 import React from "react";
 // import ReactDOM from "react-dom";
-import WaveSurfer from "wavesurfer";
+import WaveSurfer from "wavesurfer.js";
+import RegionPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions.min.js';
 import Dropdown from 'react-dropdown';
 
 
 export default class Waveform extends React.Component {
   constructor() {
     super();
+
+    this.wavesurfer; // do i need this?
 
     // ref for wavesurfer container element
     this.waveform = React.createRef();
@@ -17,12 +20,23 @@ export default class Waveform extends React.Component {
     this.getProgress = this.getProgress.bind(this);
     this.removeFile = this.removeFile.bind(this);
     this.setVolume = this.setVolume.bind(this);
-
-    // this.wavesurfer = null
+    this.createRegion = this.createRegion.bind(this);
   
     this.state = {
-      volume: 0.5
+      volume: 0.5,
     };
+  }
+
+  createRegion() {
+    const duration = this.wavesurfer.getDuration()
+    this.region = this.wavesurfer.addRegion(
+      { id: '1', 
+        start: 0, 
+        end: Math.floor(duration * .25), 
+        color: 'rgba(233, 233, 0, 0.3)' 
+      }
+    )
+    this.region.on('in', () => this.region.playLoop());
   }
 
   componentDidMount() {
@@ -31,7 +45,10 @@ export default class Waveform extends React.Component {
       waveColor: "violet",
       progressColor: "purple",
       height: 50,
-      responsive: 2.0
+      responsive: 2.0,
+      plugins: [
+        RegionPlugin.create()
+      ]
     });
 
     this.wavesurfer = wavesurfer;
@@ -45,7 +62,6 @@ export default class Waveform extends React.Component {
 
     // Hack to make wavesurfer resize
     const responsiveWave = this.wavesurfer.util.debounce(() => {
-      // wavesurfer.empty();
       wavesurfer.drawer.setWidth(0),
       wavesurfer.drawer.drawPeaks({
         length: wavesurfer.drawer.getWidth()
@@ -57,6 +73,7 @@ export default class Waveform extends React.Component {
     window.addEventListener('resize', () => {
       responsiveWave()
     });
+
   }
 
   componentWillReceiveProps(newProps) {
@@ -75,6 +92,12 @@ export default class Waveform extends React.Component {
     if (newProps.src !== this.props.src) {
       this.wavesurfer.load(newProps.src)
     }
+    if (newProps.cycle === true && newProps.cycle !== this.props.cycle) {
+      this.createRegion();      
+    }
+    if (newProps.cycle === false) {
+      this.region.remove();
+    }
   }
 
   componentWillUnmount() {
@@ -86,6 +109,8 @@ export default class Waveform extends React.Component {
   }
 
   setInitialPlayhead() {
+    this.createRegion();
+
     if (this.props.progress !== 0) {
       this.wavesurfer.seekTo(this.props.progress)
     }
@@ -99,6 +124,7 @@ export default class Waveform extends React.Component {
   }
 
   removeFile() {
+    this.region.remove()
     this.props.removeFile(this.props.idx);
   }
 
@@ -132,6 +158,6 @@ export default class Waveform extends React.Component {
   }
 }
 
-Waveform.defaultProps = {
-  src: ""
-};
+// Waveform.defaultProps = {
+//   src: ""
+// };
