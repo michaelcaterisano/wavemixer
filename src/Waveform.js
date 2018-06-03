@@ -28,11 +28,13 @@ export default class Waveform extends React.Component {
   }
 
   createRegion() {
-    const duration = this.wavesurfer.getDuration()
+    const duration = this.wavesurfer.getDuration() 
+
+    const endTime = duration < 4 ? Math.floor(duration * .5) : 2
     this.region = this.wavesurfer.addRegion(
       { id: '1', 
         start: 0, 
-        end: Math.floor(duration * .25), 
+        end: endTime, 
         color: 'rgba(233, 233, 0, 0.3)' 
       }
     )

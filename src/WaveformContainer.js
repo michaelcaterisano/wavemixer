@@ -176,8 +176,8 @@ class WaveformContainer extends React.Component {
             </button>
 
             <button onClick={this.setCycle}>
-              <i className="fas fa-backward"></i>
-              <span style={{padding: '5px'}}>Cycle</span>
+              <i className="fas fa-undo"></i>
+              <span style={{padding: '5px'}}>Cycle On/Off</span>
             </button>
             
 
