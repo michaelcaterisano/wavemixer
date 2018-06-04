@@ -3,8 +3,8 @@ import Waveform from "./Waveform";
 import Dropdown from 'react-dropdown';
 import shortid from 'shortid';
 import 'react-dropdown/style.css';
-import fileDownload from 'js-file-download';
-import jszip from 'jszip';
+//import fileDownload from 'js-file-download';
+//import jszip from 'jszip';
 
 const data = [];
 

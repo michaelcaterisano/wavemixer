@@ -9,7 +9,7 @@ export default class Waveform extends React.Component {
   constructor() {
     super();
 
-    this.wavesurfer; // do i need this?
+    this.wavesurfer = null; // do i need this?
 
     // ref for wavesurfer container element
     this.waveform = React.createRef();
@@ -64,10 +64,10 @@ export default class Waveform extends React.Component {
 
     // Hack to make wavesurfer resize
     const responsiveWave = this.wavesurfer.util.debounce(() => {
-      wavesurfer.drawer.setWidth(0),
+      wavesurfer.drawer.setWidth(0);
       wavesurfer.drawer.drawPeaks({
         length: wavesurfer.drawer.getWidth()
-      }, 0)
+      }, 0);
       wavesurfer.drawBuffer();
     }, 150); 
 
@@ -136,7 +136,7 @@ export default class Waveform extends React.Component {
   }
 
   render() {
-    const options = [...this.props.options, ]
+    //const options = [...this.props.options, ]
     let idx = this.props.idx;
     return (
       <div>
