@@ -131,6 +131,29 @@ class WaveformContainer extends React.Component {
     this.setState({ cycle: !this.state.cycle })
   }
 
+  getWaveforms() {
+    this.state.audioFiles.map((file, i) => {
+      return (
+        <Waveform
+          disabled={false}
+          key={i}
+          idx={i}
+          src={file.url}
+          name={file.name}
+          options={this.state.options}
+          handleMenuChange={this.handleMenuChange} 
+          isPlaying={this.state.isPlaying}
+          progress={this.state.progress}
+          updateProgress={this.updateProgress}
+          isAtBeginning={this.state.isAtBeginning} 
+          removeFile={this.removeFile}
+          setFinished={this.setFinished}
+          resetPlayhead={this.resetPlayhead}
+          cycle={this.state.cycle} />
+      )
+    })
+  }
+
   render() {
 
     return (
@@ -148,27 +171,8 @@ class WaveformContainer extends React.Component {
           resetPlayhead={this.resetPlayhead}
           setCycle={this.setCycle} />
 
-          {this.state.audioFiles.map((file, i) => {
-            return (
-              <Waveform
-                disabled={false}
-                key={i}
-                idx={i}
-                src={file.url}
-                name={file.name}
-                options={this.state.options}
-                handleMenuChange={this.handleMenuChange} 
-                isPlaying={this.state.isPlaying}
-                progress={this.state.progress}
-                updateProgress={this.updateProgress}
-                isAtBeginning={this.state.isAtBeginning} 
-                removeFile={this.removeFile}
-                setFinished={this.setFinished}
-                resetPlayhead={this.resetPlayhead}
-                cycle={this.state.cycle}
-              />
-            )}
-          )}
+        { this.getWaveforms() }
+
       </div>
     );
   }
