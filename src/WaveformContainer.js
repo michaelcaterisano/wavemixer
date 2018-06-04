@@ -1,17 +1,13 @@
 import React from "react";
+import Header from "./components/Header";
+import Controls from "./components/Controls";
 import Waveform from "./Waveform";
-import Dropdown from 'react-dropdown';
 import shortid from 'shortid';
-import 'react-dropdown/style.css';
-//import fileDownload from 'js-file-download';
-//import jszip from 'jszip';
 
+// you need to get rid of this...
 const data = [];
 
 const style = {
-  mainDropdown: {
-    padding: '10px'
-  },
   controls: {
     padding: '10px'
   },
@@ -139,51 +135,19 @@ class WaveformContainer extends React.Component {
 
     return (
       <div>
-        <div style={{display: 'block', width: '300px', margin: '10px'}}>
-          <h1>Oh hi</h1>
-          <span >
-          Upload one or more audio files. Click 'create waveform'
-          to generate a waveform from the currently selected file 
-          (you can change its audio source later).
-          Use the dropdown menu on the waveform to change its audio 
-          file source. Click 'remove' to remove the waveform.
-          </span>
-        </div>
+        
+        <Header />
 
-        <div style={style.mainDropdown}>
+        <Controls 
+          data={data}
+          state={this.state}
+          fileUpload={this.fileUpload}
+          updateSelectedFile={this.updateSelectedFile}
+          createWaveform={this.createWaveform}
+          togglePlay={this.togglePlay}
+          resetPlayhead={this.resetPlayhead}
+          setCycle={this.setCycle} />
 
-          <p>
-            <input type="file" multiple="multiple" onChange={this.fileUpload} disabled={this.state.isPlaying}>
-            </input>
-          </p>
-
-          <div style={{display: 'flex'}}>
-            <Dropdown options={this.state.options} onChange={(e) => this.updateSelectedFile(e)} value={this.state.selectedFileName || this.state.options[0]} placeholder={'upload some files!'} />
-            <button onClick={this.createWaveform} disabled={this.state.isPlaying || data.length === 0}>create waveform</button>
-          </div>
-
-          <p>
-            <span>Controls:</span>
-
-            <button onClick={this.togglePlay} disabled={this.state.audioFiles.length === 0}>
-              <i className={this.state.isPlaying ? "fas fa-pause-circle" : "fas fa-play-circle"}></i>
-              <span style={{padding: '5px'}}>Play/pause all</span>
-            </button>
-
-            <button onClick={this.resetPlayhead} disabled={this.state.audioFiles.length === 0}>
-              <i className="fas fa-backward"></i>
-              <span style={{padding: '5px'}}>Back to beginning</span>
-            </button>
-
-            <button onClick={this.setCycle}>
-              <i className="fas fa-undo"></i>
-              <span style={{padding: '5px'}}>Cycle On/Off</span>
-            </button>
-            
-
-          </p>
-        </div>
-      
           {this.state.audioFiles.map((file, i) => {
             return (
               <Waveform
