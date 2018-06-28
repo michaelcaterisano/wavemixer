@@ -1,23 +1,14 @@
 import React from "react";
-import Header from "./components/Header";
-import Controls from "./components/Controls";
+import Header from "./Header";
+import Controls from "./Controls";
 import Waveform from "./Waveform";
 import shortid from 'shortid';
-
-// you need to get rid of this...
-const data = [];
-
-const style = {
-  controls: {
-    padding: '10px'
-  },
-  waveForm: {
-  }
-}
 
 class WaveformContainer extends React.Component {
   constructor() {
     super();
+    // file store
+    this.data = [];
 
     this.togglePlay = this.togglePlay.bind(this);
     this.fileUpload = this.fileUpload.bind(this);
@@ -75,12 +66,12 @@ class WaveformContainer extends React.Component {
       }
 
       reader.addEventListener("load", () => {
-        if (data.find(el => el.name === file.name)) {
+        if (this.data.find(el => el.name === file.name)) {
           return
         }
 
-        data.push({id: shortid.generate(), name: file.name, url: reader.result})
-        const options = data.map(el => {
+        this.data.push({id: shortid.generate(), name: file.name, url: reader.result})
+        const options = this.data.map(el => {
           let newObj = {};
           newObj['value'] = el.id;
           newObj['label'] = el.name;
@@ -101,7 +92,7 @@ class WaveformContainer extends React.Component {
   }
 
   handleMenuChange(e, idx) {
-    const newFile = data.find(el => el.id === e.value);
+    const newFile = this.data.find(el => el.id === e.value);
     const newAudioFiles = this.state.audioFiles;
     newAudioFiles[idx] = newFile;
     this.setState({ audioFiles: newAudioFiles})
@@ -115,11 +106,11 @@ class WaveformContainer extends React.Component {
   }
 
   createWaveform() {
-    if (data.length === 0) {
+    if (this.data.length === 0) {
       return
     }
     const id = this.state.selectedFileId ? this.state.selectedFileId : this.state.options[0].value
-    const waveform = data.filter(el => el.id === id )
+    const waveform = this.data.filter(el => el.id === id )
     this.setState({ audioFiles: [...this.state.audioFiles, waveform[0]]})
   }
 
@@ -162,7 +153,7 @@ class WaveformContainer extends React.Component {
         <Header />
 
         <Controls 
-          data={data}
+          data={this.data}
           state={this.state}
           fileUpload={this.fileUpload}
           updateSelectedFile={this.updateSelectedFile}
