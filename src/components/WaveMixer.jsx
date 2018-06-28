@@ -5,7 +5,7 @@ import Header from "./Header";
 import Controls from "./Controls";
 import Waveform from "./Waveform";
 
-class WaveformContainer extends React.Component {
+class WaveMixer extends React.Component {
   constructor() {
     super();
 
@@ -111,4 +111,4 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(WaveformContainer);
+)(WaveMixer);

@@ -4,14 +4,14 @@ import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { devToolsEnhancer } from 'redux-devtools-extension';
 import reducer from './reducers/reducer';
-import WaveformContainer from './components/WaveformContainer';
+import WaveMixer from './components/WaveMixer';
 import './main.css';
 
 const store = createStore(reducer, devToolsEnhancer());
 
 render(
   <Provider store={store}>
-    <WaveformContainer />
+    <WaveMixer />
   </Provider>, 
   document.getElementById('root')
 );
