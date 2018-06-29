@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from 'react-redux';
 import Header from "./Header";
+import FileUploads from './FileUploads';
 import Controls from "./Controls";
 import Waveform from "./Waveform";
 
@@ -16,6 +17,7 @@ class WaveMixer extends React.Component {
     return (
       <div>
         <Header />
+        <FileUploads data={ this.data } />
         <Controls data={ this.data } />
 
         { 
