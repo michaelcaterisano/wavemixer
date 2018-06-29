@@ -26,7 +26,7 @@ const Controls = (props) => {
       const file = files[i];
 
       if (!props.files.includes(file)){
-        props.addAudioFile(file);
+        props.addFile(file);
       }
 
       reader.addEventListener("load", () => {
@@ -68,8 +68,12 @@ const Controls = (props) => {
       </div>
 
       <div style={style.dropdown}>
-        <Dropdown options={props.options} onChange={
-          (e) => props.updateSelectedFile(e)} value={props.selectedFileName || props.options[0]} placeholder={'upload some files!'} />
+        <Dropdown 
+          options={ props.options } 
+          onChange={ (e) => props.updateSelectedFile(e) } 
+          value={ props.selectedFileName || props.options[0] } 
+          placeholder='upload some files!' />
+          
         <button onClick={createWaveform} disabled={props.isPlaying || props.data.length === 0}>
           create waveform
         </button>
@@ -117,6 +121,9 @@ const mapDispatchToProps = (dispatch) => {
     addAudioFile: (file) => {
       dispatch(actions.addAudioFile(file));
     },
+    addFile: (file) => {
+      dispatch(actions.addFile(file));
+    },
     setCycle: () => {
       dispatch(actions.toggleCycle());
     },
@@ -128,6 +135,7 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(actions.setBegining(false));
     },
     updateSelectedFile: (e) => {
+      console.log('id: ', e.value ,'name: ', e.label)
       dispatch(actions.setFileId(e.value));
       dispatch(actions.setFileName(e.label));
     } 

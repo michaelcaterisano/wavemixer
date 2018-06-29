@@ -35,14 +35,20 @@ function app(state = init.app, action) {
       );
 
     case 'ADD_AUDIO_FILE':
-      const newList = [...state.files, action.file];
+      const newAudioList = [...state.audioFiles, action.file];
       return Object.assign(
-        {}, state, { audioFiles: newList }
+        {}, state, { audioFiles: newAudioList }
       );
 
     case 'EDIT_AUDIO_FILES':
       return Object.assign(
         {}, state, { audioFiles: action.files }
+      );
+
+      case 'ADD_FILE':
+      const newFileList = [...state.files, action.file];
+      return Object.assign(
+        {}, state, { files: newFileList }
       );
 
     case 'SET_OPTIONS':

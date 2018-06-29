@@ -1,6 +1,5 @@
 import React from "react";
 import { connect } from 'react-redux';
-import * as actions from '../actions/actions';
 import Header from "./Header";
 import Controls from "./Controls";
 import Waveform from "./Waveform";

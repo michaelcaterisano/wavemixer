@@ -30,6 +30,10 @@ export function editAudioFiles(files) {
   return { type: 'EDIT_AUDIO_FILES', files}
 };
 
+export function addFile(file) {
+  return { type: 'ADD_FILE', file}
+};
+
 export function setOptions(options) {
   return { type: 'SET_OPTIONS', options}
 };
