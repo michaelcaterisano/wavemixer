@@ -45,7 +45,7 @@ function app(state = init.app, action) {
         {}, state, { audioFiles: action.files }
       );
 
-      case 'ADD_FILE':
+    case 'ADD_FILE':
       const newFileList = [...state.files, action.file];
       return Object.assign(
         {}, state, { files: newFileList }

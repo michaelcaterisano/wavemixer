@@ -19,7 +19,7 @@ const Controls = (props) => {
   };
 
   const fileUpload = (event) => {
-    const files = event.target.files
+    const files = event.target.files;
 
     for (let i = 0; i < files.length; i++) {
       const reader = new FileReader();
@@ -34,21 +34,25 @@ const Controls = (props) => {
           return
         }
 
-        props.data.push({id: shortid.generate(), name: file.name, url: reader.result})
+        props.data.push({id: shortid.generate(), name: file.name, url: reader.result});
+
         const options = props.data.map(el => {
+          props.setSelectedFile( el.id, el.name );
+
           let newObj = {};
           newObj['value'] = el.id;
           newObj['label'] = el.name;
           return newObj;
         })
-        props.setOptions( options )
+        
+        props.setOptions( options );
       }, false);
   
       if (file) {
         reader.readAsDataURL(file);
       }
     }
-    event.target.value = null;
+    //event.target.value = null;
   };
 
   const createWaveform = () => {
@@ -64,7 +68,7 @@ const Controls = (props) => {
     <div style={style.main}>
 
       <div>
-        <input type="file" multiple="multiple" onChange={fileUpload} disabled={props.isPlaying} />
+        <input type="file" multiple="multiple" onChange={ (e) => fileUpload(e) } disabled={props.isPlaying} />
       </div>
 
       <div style={style.dropdown}>
@@ -134,8 +138,11 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(actions.togglePlaying());
       dispatch(actions.setBegining(false));
     },
+    setSelectedFile: (id, name) => {
+      dispatch(actions.setFileId(id));
+      dispatch(actions.setFileName(name));
+    },
     updateSelectedFile: (e) => {
-      console.log('id: ', e.value ,'name: ', e.label)
       dispatch(actions.setFileId(e.value));
       dispatch(actions.setFileName(e.label));
     } 
