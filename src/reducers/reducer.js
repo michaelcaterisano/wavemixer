@@ -16,7 +16,12 @@ function app(state = init.app, action) {
 
     case 'TOGGLE_PLAYING':
       return Object.assign(
-        {}, state, { selectedFileName: !state.isPlaying }
+        {}, state, { isPlaying: !state.isPlaying }
+      );
+
+      case 'SET_PLAYING':
+      return Object.assign(
+        {}, state, { isPlaying: action.bool }
       );
 
     case 'SET_BEGINING':
@@ -35,9 +40,19 @@ function app(state = init.app, action) {
         {}, state, { audioFiles: newList }
       );
 
+    case 'EDIT_AUDIO_FILES':
+      return Object.assign(
+        {}, state, { audioFiles: action.files }
+      );
+
     case 'SET_OPTIONS':
       return Object.assign(
         {}, state, { options: action.options }
+      );
+
+    case 'SET_PROGRESS':
+      return Object.assign(
+        {}, state, { progress: action.progress }
       );
 
     default:
