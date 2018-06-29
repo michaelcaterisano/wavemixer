@@ -3,6 +3,7 @@ import Dropdown from 'react-dropdown';
 import { connect } from 'react-redux';
 import * as actions from '../actions/actions';
 import shortid from 'shortid';
+import PlaybackButton from './PlaybackButton';
 import 'react-dropdown/style.css';
 import style from '../styles/controls.style';
 
@@ -76,20 +77,27 @@ const Controls = (props) => {
       <div>
         <span>Controls:</span>
 
-        <button onClick={props.togglePlay} disabled={props.audioFiles.length === 0}>
-          <i className={props.isPlaying ? "fas fa-pause-circle" : "fas fa-play-circle"} />
-          <span style={style.button}>Play/pause all</span>
-        </button>
+        <PlaybackButton 
+          text="Play/Pause All"
+          handleClick={ props.togglePlay }
+          disabled={ props.audioFiles.length === 0 }
+          css={ style.button }
+          iconClass={ props.isPlaying ? "fas fa-pause-circle" : "fas fa-play-circle" } />
+        
+        <PlaybackButton 
+          text="Back to Beginning"
+          handleClick={ props.resetPlayhead }
+          disabled={ props.audioFiles.length === 0 }
+          css={ style.button }
+          iconClass="fas fa-backward" />
+        
+        <PlaybackButton 
+          text="Cycle On/Off"
+          handleClick={ props.setCycle }
+          disabled={ props.audioFiles.length === 0 }
+          css={ style.button }
+          iconClass="fas fa-undo" />
 
-        <button onClick={props.resetPlayhead} disabled={props.audioFiles.length === 0}>
-          <i className="fas fa-backward" />
-          <span style={style.button}>Back to beginning</span>
-        </button>
-
-        <button onClick={props.setCycle}>
-          <i className="fas fa-undo" />
-          <span style={style.button}>Cycle On/Off</span>
-        </button>
       </div>
 
     </div>

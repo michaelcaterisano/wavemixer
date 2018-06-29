@@ -1,6 +1,6 @@
 export const app = {
   audioFiles: [],
-  cycle: true,
+  cycle: false,
   files: [],
   isAtBeginning: true,
   isPlaying: false,
