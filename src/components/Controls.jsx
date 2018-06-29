@@ -4,19 +4,9 @@ import { connect } from 'react-redux';
 import * as actions from '../actions/actions';
 import shortid from 'shortid';
 import 'react-dropdown/style.css';
+import style from '../styles/controls.style';
 
 const Controls = (props) => {
-  const style = {
-    main: {
-      padding: '10px'
-    },
-    dropdown: {
-      display: 'flex'
-    },
-    button: {
-      padding: '5px'
-    }
-  };
 
   const fileUpload = (event) => {
     const files = event.target.files;
@@ -44,7 +34,7 @@ const Controls = (props) => {
           newObj['label'] = el.name;
           return newObj;
         })
-        
+
         props.setOptions( options );
       }, false);
   

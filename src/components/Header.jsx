@@ -1,12 +1,8 @@
 import React from 'react';
+import style from '../styles/header.style';
 
 export default (props) => {
-  const style = {
-    display: 'block', 
-    width: '300px', 
-    margin: '10px'
-  };
-  
+
   return (
     <header style={style}>
       <h1>Oh hi</h1>
