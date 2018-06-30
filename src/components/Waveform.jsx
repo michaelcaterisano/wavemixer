@@ -144,7 +144,7 @@ class Waveform extends React.Component {
 
   updateProgress(progress) {
     this.props.setProgress(progress);
-    this.props.setBegining(false);
+    this.props.setBeginning(false);
   }
 
   handleMenuChange(e, idx) {
@@ -159,6 +159,7 @@ class Waveform extends React.Component {
 
     return (
       <div>
+
         <div ref={this.waveform} />
 
         <div>
@@ -195,8 +196,8 @@ const mapDispatchToProps = (dispatch) => {
     editAudioFiles: (files) => {
       dispatch(actions.editAudioFiles(files));
     },
-    setBegining: (bool) => {
-      dispatch(actions.setBegining(bool));
+    setBeginning: (bool) => {
+      dispatch(actions.setBeginning(bool));
     },
     setPlaying: (bool) => {
       dispatch(actions.setPlaying(bool));

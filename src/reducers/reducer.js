@@ -24,7 +24,7 @@ function app(state = init.app, action) {
         {}, state, { isPlaying: action.bool }
       );
 
-    case 'SET_BEGINING':
+    case 'SET_BEGINNING':
       return Object.assign(
         {}, state, { isAtBeginning: action.bool }
       );

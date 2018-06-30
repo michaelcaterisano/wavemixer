@@ -48,14 +48,14 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     resetPlayhead: () => {
-      dispatch(actions.setBegining(true));
+      dispatch(actions.setBeginning(true));
     },
     setCycle: () => {
       dispatch(actions.toggleCycle());
     },
     togglePlay: () => {
       dispatch(actions.togglePlaying());
-      dispatch(actions.setBegining(false));
+      dispatch(actions.setBeginning(false));
     }
   };
 };

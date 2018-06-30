@@ -14,8 +14,8 @@ export function setPlaying(bool) {
   return { type: 'SET_PLAYING', bool }
 };
 
-export function setBegining(bool) {
-  return { type: 'SET_BEGINING', bool }
+export function setBeginning(bool) {
+  return { type: 'SET_BEGINNING', bool }
 };
 
 export function toggleCycle() {
