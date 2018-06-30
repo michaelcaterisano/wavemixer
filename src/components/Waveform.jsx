@@ -1,44 +1,33 @@
 import React from "react";
-// import ReactDOM from "react-dom";
+import { connect } from 'react-redux';
+import * as actions from '../actions/actions';
 import WaveSurfer from "wavesurfer.js";
 import RegionPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.regions.min.js';
 import Dropdown from 'react-dropdown';
 
 
-export default class Waveform extends React.Component {
+class Waveform extends React.Component {
   constructor() {
     super();
 
-    this.wavesurfer; // do i need this?
+    this.wavesurfer = null; // do i need this?
 
     // ref for wavesurfer container element
     this.waveform = React.createRef();
 
-    // bound functions
+    // bind functions
+    this.createRegion = this.createRegion.bind(this);
     this.resetPlayhead = this.resetPlayhead.bind(this);
     this.setInitialPlayhead = this.setInitialPlayhead.bind(this);
     this.getProgress = this.getProgress.bind(this);
-    this.removeFile = this.removeFile.bind(this);
     this.setVolume = this.setVolume.bind(this);
-    this.createRegion = this.createRegion.bind(this);
+    this.removeFile = this.removeFile.bind(this);
+    this.updateProgress = this.updateProgress.bind(this);
+    this.handleMenuChange = this.handleMenuChange.bind(this);
   
     this.state = {
       volume: 0.5,
     };
-  }
-
-  createRegion() {
-    const duration = this.wavesurfer.getDuration() 
-
-    const endTime = duration < 4 ? Math.floor(duration * .5) : 2
-    this.region = this.wavesurfer.addRegion(
-      { id: '1', 
-        start: 0, 
-        end: endTime, 
-        color: 'rgba(233, 233, 0, 0.3)' 
-      }
-    )
-    this.region.on('in', () => this.region.playLoop());
   }
 
   componentDidMount() {
@@ -56,18 +45,18 @@ export default class Waveform extends React.Component {
     this.wavesurfer = wavesurfer;
 
     this.wavesurfer.load(this.props.src);
-    this.wavesurfer.on('seek', this.props.updateProgress)
+    this.wavesurfer.on('seek', this.updateProgress)
     this.wavesurfer.on('pause', this.getProgress)
     this.wavesurfer.on('ready', this.setInitialPlayhead)
-    this.wavesurfer.on('finish', this.props.setFinished)
+    this.wavesurfer.on('finish', () => this.props.setPlaying(false))
 
 
     // Hack to make wavesurfer resize
     const responsiveWave = this.wavesurfer.util.debounce(() => {
-      wavesurfer.drawer.setWidth(0),
+      wavesurfer.drawer.setWidth(0);
       wavesurfer.drawer.drawPeaks({
         length: wavesurfer.drawer.getWidth()
-      }, 0)
+      }, 0);
       wavesurfer.drawBuffer();
     }, 150); 
 
@@ -106,6 +95,20 @@ export default class Waveform extends React.Component {
     this.wavesurfer.destroy();
   }
 
+  createRegion() {
+    const duration = this.wavesurfer.getDuration() 
+
+    const endTime = duration < 4 ? Math.floor(duration * .5) : 2
+    this.region = this.wavesurfer.addRegion(
+      { id: '1', 
+        start: 0, 
+        end: endTime, 
+        color: 'rgba(233, 233, 0, 0.3)' 
+      }
+    )
+    this.region.on('in', () => this.region.playLoop());
+  }
+
   resetPlayhead() {
     this.wavesurfer.seekTo(0);
   }
@@ -122,12 +125,7 @@ export default class Waveform extends React.Component {
     const current = this.wavesurfer.getCurrentTime();
     const duration = this.wavesurfer.getDuration();
     const progress = current/duration
-    this.props.updateProgress(progress)
-  }
-
-  removeFile() {
-    this.region.remove()
-    this.props.removeFile(this.props.idx);
+    this.updateProgress(progress)
   }
 
   setVolume(e) {
@@ -135,11 +133,33 @@ export default class Waveform extends React.Component {
     this.wavesurfer.setVolume(e.target.value)
   }
 
+  removeFile() {
+    const idx = this.props.idx;
+    this.region.remove(); // why is region on the instance? Plus, it's not declared until later.
+    this.props.setPlaying(false);
+    const newAudioFiles = Array.from(this.props.audioFiles); // it's already an array?
+    newAudioFiles.splice(idx, 1);
+    this.props.editAudioFiles(newAudioFiles);
+  }
+
+  updateProgress(progress) {
+    this.props.setProgress(progress);
+    this.props.setBeginning(false);
+  }
+
+  handleMenuChange(e, idx) {
+    const newFile = this.props.data.find(el => el.id === e.value);
+    const newAudioFiles = this.props.audioFiles;
+    newAudioFiles[idx] = newFile;
+    this.props.editAudioFiles(newAudioFiles);
+  }
+
   render() {
-    const options = [...this.props.options, ]
     let idx = this.props.idx;
+
     return (
       <div>
+
         <div ref={this.waveform} />
 
         <div>
@@ -149,10 +169,10 @@ export default class Waveform extends React.Component {
         <div style={{display: 'flex'}}>
           <Dropdown disabled={this.props.isPlaying} 
                     options={this.props.options} 
-                    onChange={(e) => this.props.handleMenuChange(e, idx)} 
+                    onChange={(e) => this.handleMenuChange(e, idx)} 
                     value={this.props.name} 
                     placeholder="Select an option"/>
-          <button onClick={() => this.removeFile() }>remove</button>
+          <button onClick={ this.removeFile }>remove</button>
         </div>
         
       </div>
@@ -160,6 +180,35 @@ export default class Waveform extends React.Component {
   }
 }
 
-// Waveform.defaultProps = {
-//   src: ""
-// };
+const mapStateToProps = (state) => {
+  return {
+    audioFiles: state.app.audioFiles,
+    cycle: state.app.cycle,
+    isAtBeginning: state.app.isAtBeginning,
+    isPlaying: state.app.isPlaying,
+    options: state.app.options,
+    progress: state.app.progress
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    editAudioFiles: (files) => {
+      dispatch(actions.editAudioFiles(files));
+    },
+    setBeginning: (bool) => {
+      dispatch(actions.setBeginning(bool));
+    },
+    setPlaying: (bool) => {
+      dispatch(actions.setPlaying(bool));
+    },
+    setProgress: (progress) => {
+      dispatch(actions.setProgress(progress));
+    }
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Waveform);

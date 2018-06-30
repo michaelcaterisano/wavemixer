@@ -1,10 +1,17 @@
 import React from 'react';
 import { render } from 'react-dom';
-import WaveformContainer from './WaveformContainer';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import { devToolsEnhancer } from 'redux-devtools-extension';
+import reducer from './reducers/reducer';
+import WaveMixer from './components/WaveMixer';
 import './main.css';
 
-const App = () => (
-  <WaveformContainer />  
-);
+const store = createStore(reducer, devToolsEnhancer());
 
-render(<App />, document.getElementById('root'));
+render(
+  <Provider store={store}>
+    <WaveMixer />
+  </Provider>, 
+  document.getElementById('root')
+);
